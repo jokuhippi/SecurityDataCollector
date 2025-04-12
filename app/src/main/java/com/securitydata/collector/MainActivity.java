@@ -1,6 +1,9 @@
 package com.securitydata.collector;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private void collectSecurityData() {
         // TODO collect other data and print to logcat
         collectAccessibilityApps();
+        collectNotificationListenerApps();
     }
 
     /**
@@ -79,7 +83,24 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             Log.e(LOG_TAG, "error: " + e.getMessage());
         }
+    }
 
+    /**
+     * Prints notification listener apps to logcat in JSON format.
+     */
+    private void collectNotificationListenerApps() {
+        List<String> accessibilityApps = getNotificationListenerApps();
+        try {
+            JSONObject appsObject = new JSONObject();
+            JSONArray appsArray = new JSONArray();
+            for (String app : accessibilityApps) {
+                appsArray.put(app);
+            }
+            appsObject.put("notificationListenerApps", appsArray);
+            Log.i(LOG_TAG, appsObject.toString());
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "error: " + e.getMessage());
+        }
     }
 
     /**
@@ -106,5 +127,29 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return accessibilityApps;
+    }
+
+    /**
+     * Returns package names of apps that can be allowed to access notifications in device settings.
+     * This method only checks apps that have defined NotificationListenerService and
+     * associated permission in their manifest, so returned list also contains apps that have
+     * not yet been given access to notifications.
+     * @return List of package names
+     */
+    private List<String> getNotificationListenerApps() {
+        ArrayList<String> apps = new ArrayList<>();
+        PackageManager pm = getApplicationContext().getPackageManager();
+        Intent intent = new Intent("android.service.notification.NotificationListenerService");
+        List<ResolveInfo> resolveInfos = pm.queryIntentServices(intent,
+                PackageManager.GET_META_DATA);
+        for (ResolveInfo resolveInfo : resolveInfos) {
+            if(resolveInfo.serviceInfo != null) {
+                String permission = resolveInfo.serviceInfo.permission;
+                if (permission.equals("android.permission.BIND_NOTIFICATION_LISTENER_SERVICE")) {
+                    apps.add(resolveInfo.serviceInfo.packageName);
+                }
+            }
+        }
+        return apps;
     }
 }
