@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.util.Log;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         // TODO collect other data and print to logcat
         collectAccessibilityApps();
         collectNotificationListenerApps();
+        collectDefaultSmsApp();
     }
 
     /**
@@ -80,6 +82,23 @@ public class MainActivity extends AppCompatActivity {
             }
             appsObject.put("enabledAccessibilityApps", appsArray);
             Log.i(LOG_TAG, appsObject.toString());
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Prints package name of default SMS app to logcat in JSON format.
+     */
+    private void collectDefaultSmsApp() {
+        String defaultSmsApp = Telephony.Sms.getDefaultSmsPackage(getApplicationContext());
+        if(defaultSmsApp == null) {
+            defaultSmsApp = "";
+        }
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("defaultSmsApp", defaultSmsApp);
+            Log.i(LOG_TAG, jsonObject.toString());
         } catch (JSONException e) {
             Log.e(LOG_TAG, "error: " + e.getMessage());
         }
