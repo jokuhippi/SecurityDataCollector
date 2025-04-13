@@ -86,9 +86,9 @@ public class MainActivity extends AppCompatActivity {
             for (String app : enabledAccessibilityApps) {
                 appsArray.put(app);
             }
-            appsObject.put("enabledAccessibilityApps.json", appsArray);
+            appsObject.put("enabledAccessibilityApps", appsArray);
             Log.i(LOG_TAG, appsObject.toString());
-            saveToFile("enabled-accessibility-apps", appsObject.toString());
+            saveToFile("enabled-accessibility-apps.json", appsObject.toString());
         } catch (JSONException e) {
             Log.e(LOG_TAG, "error: " + e.getMessage());
         }
