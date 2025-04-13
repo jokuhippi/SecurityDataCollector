@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void collectSecurityData() {
-        // TODO collect other data and print to logcat
         collectAccessibilityApps();
         collectNotificationListenerApps();
         collectDefaultSmsApp();
@@ -80,14 +79,14 @@ public class MainActivity extends AppCompatActivity {
             }
             appsObject.put("allAccessibilityApps", appsArray);
             Log.i(LOG_TAG, appsObject.toString());
-            saveToFile("all-accessibility-apps", appsObject.toString());
+            saveToFile("all-accessibility-apps.json", appsObject.toString());
 
             appsObject = new JSONObject();
             appsArray = new JSONArray();
             for (String app : enabledAccessibilityApps) {
                 appsArray.put(app);
             }
-            appsObject.put("enabledAccessibilityApps", appsArray);
+            appsObject.put("enabledAccessibilityApps.json", appsArray);
             Log.i(LOG_TAG, appsObject.toString());
             saveToFile("enabled-accessibility-apps", appsObject.toString());
         } catch (JSONException e) {
